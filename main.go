@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -12,26 +13,19 @@ import (
 func main() {
 
 	r := mux.NewRouter()
-	r.HandleFunc("/hola", func(w http.ResponseWriter, r *http.Request) {
-		response, err := http.Get("https://catfact.ninja/#")
+	r.HandleFunc("/xd", func(w http.ResponseWriter, r *http.Request) {
+		response, err := http.Get("https://catfact.ninja/fact")
 		if err != nil {
 			fmt.Print(err.Error())
 			os.Exit(1)
 		}
-	})
-	r.HandleFunc("/Nachin", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("General Kenobi!\n"))
+		responseData, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		w.Write(responseData)
+		fmt.Println(string(responseData))
 	})
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8080", r))
-
-	// srv := &http.Server{
-	// 	Handler:      r,
-	// 	Addr:         "127.0.0.1:8080",
-	// 	WriteTimeout: 15 * time.Second,
-	// 	ReadTimeout:  15 * time.Second,
-	// }
-
-	// log.Fatal(srv.ListenAndServe())
-
 }
