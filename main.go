@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -9,6 +10,10 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+type CatRace struct {
+	race string
+}
 
 func main() {
 
@@ -25,7 +30,13 @@ func main() {
 		}
 		w.Write(responseData)
 		fmt.Println(string(responseData))
+		var catRace []CatRace
+		errM := json.Unmarshal(responseData, &catRace)
+		if errM != nil {
+			fmt.Println("error:", err)
+		}
 	})
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8080", r))
+
 }
