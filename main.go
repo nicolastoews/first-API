@@ -7,13 +7,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 
 	"github.com/gorilla/mux"
 )
 
-type CurrentPage struct {
-	Current_page int        `json:"current_page"`
-	Data         []CatBreed `json:"data"`
+type BreedMetadata struct {
+	Currentpage int        `json:"current_page"`
+	Data        []CatBreed `json:"data"`
 }
 
 type CatBreed struct {
@@ -33,17 +34,29 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		w.Write(responseData)
+		//w.Write(responseData)
 		//fmt.Println(string(responseData))
-		var currentPage CurrentPage
-		errM := json.Unmarshal([]byte(responseData), &currentPage)
-		if errM != nil {
+		var metadata BreedMetadata
+		err = json.Unmarshal([]byte(responseData), &metadata)
+		if err != nil {
 			fmt.Println("error:", err)
 		}
-		fmt.Println((currentPage))
-		for _, element := range currentPage.Data {
-			w.Write([]byte(element.Breed))
+
+		catBreedList := make([]string, 0, len(metadata.Data))
+		for _, element := range metadata.Data {
+			//catBreedList[i] = element.Breed
+			catBreedList = append(catBreedList, element.Breed)
 		}
+		//res, err := json.Marshal(catBreedList)
+		// if err != nil {
+		// 	fmt.Println("error:", err)
+		// }
+		sort.Sort(sort.Reverse(sort.StringSlice(catBreedList)))
+		res, err := json.Marshal(catBreedList)
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+		w.Write(res)
 	})
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8080", r))
