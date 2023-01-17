@@ -11,15 +11,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type CatRace struct {
-	race string
+type CurrentPage struct {
+	Current_page int        `json:"current_page"`
+	Data         []CatBreed `json:"data"`
+}
+
+type CatBreed struct {
+	Breed string `json:"breed"`
 }
 
 func main() {
 
 	r := mux.NewRouter()
-	r.HandleFunc("/xd", func(w http.ResponseWriter, r *http.Request) {
-		response, err := http.Get("https://catfact.ninja/fact")
+	r.HandleFunc("/breeds", func(w http.ResponseWriter, r *http.Request) {
+		response, err := http.Get("https://catfact.ninja/breeds")
 		if err != nil {
 			fmt.Print(err.Error())
 			os.Exit(1)
@@ -29,11 +34,15 @@ func main() {
 			log.Fatal(err)
 		}
 		w.Write(responseData)
-		fmt.Println(string(responseData))
-		var catRace []CatRace
-		errM := json.Unmarshal(responseData, &catRace)
+		//fmt.Println(string(responseData))
+		var currentPage CurrentPage
+		errM := json.Unmarshal([]byte(responseData), &currentPage)
 		if errM != nil {
 			fmt.Println("error:", err)
+		}
+		fmt.Println((currentPage))
+		for _, element := range currentPage.Data {
+			w.Write([]byte(element.Breed))
 		}
 	})
 	http.Handle("/", r)
