@@ -28,7 +28,15 @@ type FactMetadata struct {
 
 type CatFact struct {
 	Fact string `json:"fact"`
-	Len string `json:"length"`
+}
+
+type FactsMetadata struct {
+	Currentpage int        `json:"current_page"`
+	Data        []CatFacts `json:"data"`
+}
+
+type CatFacts struct {
+	Fact string `json:"fact"`
 }
 
 type ByLen []string
@@ -96,7 +104,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var metadata BreedMetadata
+		var metadata FactsMetadata
 		err = json.Unmarshal([]byte(responseData), &metadata)
 		if err != nil {
 			fmt.Println("error:", err)
@@ -104,12 +112,11 @@ func main() {
 
 		FactsList := make([]string, 0, len(metadata.Data))
 		for _, element := range metadata.Data {
-			FactsList = append(FactsList, element.Breed)
+			FactsList = append(FactsList, element.Fact)
 		}
+
 		sort.Strings(FactsList)
-
 		sort.Sort(ByLen(FactsList))
-
 		res, err := json.Marshal(FactsList)
 		if err != nil {
 			fmt.Println("error:", err)
