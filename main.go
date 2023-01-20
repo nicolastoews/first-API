@@ -28,15 +28,7 @@ type FactMetadata struct {
 
 type CatFact struct {
 	Fact string `json:"fact"`
-}
-
-type FactsMetadata struct {
-	Currentpage int        `json:"current_page"`
-	Data        []CatFacts `json:"data"`
-}
-
-type CatFacts struct {
-	Fact string `json:"fact"`
+	Len  string `json:"length"`
 }
 
 type ByLen []string
@@ -104,7 +96,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var metadata FactsMetadata
+		var metadata FactMetadata
 		err = json.Unmarshal([]byte(responseData), &metadata)
 		if err != nil {
 			fmt.Println("error:", err)
