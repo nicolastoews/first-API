@@ -21,7 +21,6 @@ type CatBreed struct {
 	Breed string `json:"breed"`
 }
 
-
 func main() {
 
 	r := mux.NewRouter()
@@ -52,6 +51,56 @@ func main() {
 		}
 		w.Write(res)
 	})
+
+	r.HandleFunc("/fact", func(w http.ResponseWriter, r *http.Request) {
+		response, err := http.Get("https://catfact.ninja/fact")
+		if err != nil {
+			fmt.Print(err.Error())
+			os.Exit(1)
+		}
+		responseData, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var metadata BreedMetadata
+		err = json.Unmarshal([]byte(responseData), &metadata)
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+		w.Write(responseData)
+	})
+
+	r.HandleFunc("/facts", func(w http.ResponseWriter, r *http.Request) {
+		response, err := http.Get("https://catfact.ninja/facts")
+		if err != nil {
+			fmt.Print(err.Error())
+			os.Exit(1)
+		}
+		responseData, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var metadata BreedMetadata
+		err = json.Unmarshal([]byte(responseData), &metadata)
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+
+		catFactList := make([]string, 0, len(metadata.Data))
+		for _, element := range metadata.Data {
+			catFactList = append(catFactList, element.Breed)
+		}
+		sort.Strings(catFactList)
+		sort.Slice(catFactList, func(i, j int) bool {
+			return len(catFactList[i]) < len(catFactList[j])
+		})
+		res, err := json.Marshal(catFactList)
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+		w.Write(res)
+	})
+
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8080", r))
 
