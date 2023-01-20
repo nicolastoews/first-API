@@ -21,6 +21,7 @@ type CatBreed struct {
 	Breed string `json:"breed"`
 }
 
+
 func main() {
 
 	r := mux.NewRouter()
@@ -34,8 +35,6 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		//w.Write(responseData)
-		//fmt.Println(string(responseData))
 		var metadata BreedMetadata
 		err = json.Unmarshal([]byte(responseData), &metadata)
 		if err != nil {
@@ -44,13 +43,8 @@ func main() {
 
 		catBreedList := make([]string, 0, len(metadata.Data))
 		for _, element := range metadata.Data {
-			//catBreedList[i] = element.Breed
 			catBreedList = append(catBreedList, element.Breed)
 		}
-		//res, err := json.Marshal(catBreedList)
-		// if err != nil {
-		// 	fmt.Println("error:", err)
-		// }
 		sort.Sort(sort.Reverse(sort.StringSlice(catBreedList)))
 		res, err := json.Marshal(catBreedList)
 		if err != nil {
