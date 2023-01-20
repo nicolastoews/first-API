@@ -28,6 +28,7 @@ type FactMetadata struct {
 
 type CatFact struct {
 	Fact string `json:"fact"`
+	Len string `json:"length"`
 }
 
 type ByLen []string
