@@ -21,6 +21,11 @@ type CatBreed struct {
 	Breed string `json:"breed"`
 }
 
+type ByLen []string
+func (a ByLen) Len() int           { return len(a) }
+func (a ByLen) Less(i, j int) bool { return len(a[i]) < len(a[j]) }
+func (a ByLen) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
 func main() {
 
 	r := mux.NewRouter()
@@ -86,15 +91,15 @@ func main() {
 			fmt.Println("error:", err)
 		}
 
-		catFactList := make([]string, 0, len(metadata.Data))
+		FactsList := make([]string, 0, len(metadata.Data))
 		for _, element := range metadata.Data {
-			catFactList = append(catFactList, element.Breed)
+			FactsList = append(FactsList, element.Breed)
 		}
-		sort.Strings(catFactList)
-		sort.Slice(catFactList, func(i, j int) bool {
-			return len(catFactList[i]) < len(catFactList[j])
-		})
-		res, err := json.Marshal(catFactList)
+		sort.Strings(FactsList)
+		
+		sort.Sort(ByLen(FactsList))
+
+		res, err := json.Marshal(FactsList)
 		if err != nil {
 			fmt.Println("error:", err)
 		}
