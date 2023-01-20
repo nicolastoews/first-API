@@ -21,7 +21,17 @@ type CatBreed struct {
 	Breed string `json:"breed"`
 }
 
+type FactMetadata struct {
+	Currentpage int       `json:"current_page"`
+	Data        []CatFact `json:"data"`
+}
+
+type CatFact struct {
+	Fact string `json:"fact"`
+}
+
 type ByLen []string
+
 func (a ByLen) Len() int           { return len(a) }
 func (a ByLen) Less(i, j int) bool { return len(a[i]) < len(a[j]) }
 func (a ByLen) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
@@ -67,7 +77,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var metadata BreedMetadata
+		var metadata FactMetadata
 		err = json.Unmarshal([]byte(responseData), &metadata)
 		if err != nil {
 			fmt.Println("error:", err)
@@ -96,7 +106,7 @@ func main() {
 			FactsList = append(FactsList, element.Breed)
 		}
 		sort.Strings(FactsList)
-		
+
 		sort.Sort(ByLen(FactsList))
 
 		res, err := json.Marshal(FactsList)
